@@ -1,0 +1,198 @@
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width;">
+        <title>Duck Water Temp</title>
+        <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+        <script src="flot/jquery.flot.js"></script>
+
+        <style type="text/css">
+            body { margin: 0px; }
+            a { border: none; }
+            .air { color: green; background-color: #dfd; }
+            .water { color: blue; background-color: #ddf; }
+            h1 { margin-top: 0.1em; margin-bottom: 0.25em; }
+
+            div#chart {
+                border: 1px solid red;
+                width: 310px;
+                height: 200px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            div#foo {
+                margin-left: auto;
+                width: 320px !important;
+                height: 480px !important;
+                border: 1px dashed black;
+                margin-right: auto;
+                text-align: center;
+            }
+            .full {
+                width: 100%;
+            }
+            table#summary {
+                margin: none;
+                padding: none;
+            }
+
+            table#summary th.header {
+                text-align: center;
+                border-bottom: 1px solid black;
+            }
+
+            table#summary td.air, table#summary td.water {
+                width: 30%;
+            }
+
+
+            table#summary td, table#summary th {
+                text-align: right;
+                border-bottom: 1px solid #333;
+            }
+
+            table#summary td.air, table#summary th.air {
+                border-bottom: 1px solid #3f3;
+            }
+
+            table#summary td.water, table#summary th.water {
+                border-bottom: 1px solid #33f;
+            }
+
+            img#chart {
+                width: 100%;
+            }
+        </style>
+        <script type="text/javascript">
+            $(document).ready(function() {
+                    // $.ajax({
+                    //       url: 'realtime2/DUKN7.txt',
+                    //       data: [],
+                    //       error: function(a, b, c) { console.log({ cb: "error", a: a, b: b, c: c }); },
+                    //       success: function(a, b, c) { console.log({ cb: "success", a: a, b: b, c: c }); },
+                    //       dataType: "text"
+                    //       });
+
+                    // $.get('http://www.ndbc.noaa.gov/data/realtime2/DUKN7.js',
+                    //     function(data, textStatus, vXMLHttpRequest) { console.log("data: %o, textStatus: %o, vXMLHttpRequest: %o", data, textStatus, vXMLHttpRequest); });
+
+                    var update = function() {
+                        $('#webkist-median-spark').html("Loading...");
+                        $.getJSON("DUKN7.js", null, function(json) {
+                            var data = json.data;
+                            var summary = json.summary;
+                            // console.log(data);
+                            var waterMedian = new Array();
+                            var airMedian = new Array();
+                            var ticks = new Array();
+
+                            for(var i=0; i<data.length; i++) {
+                                // console.log(data[i].water.median);
+                                waterMedian.push([ i, data[i].water.median ]);
+                                airMedian.push([ i, data[i].air.median ]);
+                                if(data[i].hour.match(/12AM/)) {
+                                  ticks.push(i);
+                                }
+                            }
+
+                            // $('#webkist-median-spark').sparkline(airMedian,
+                            //     { lineColor: "green", fillColor: false, chartRangeMin: 55, chartRangeMax: 90, width: "200px" });
+                            // $('#webkist-median-spark').sparkline(waterMedian,
+                            //     { lineColor: "blue", fillColor: false, chartRangeMin: 55, chartRangeMax: 90, composite: true });
+
+			    var tickFmt = function(val, axis) {
+			        if(data[val]) {
+				    return data[val].hour.substring(0,3);
+				} else {
+				    return "";
+				}
+	                    };
+
+                            $.plot($('#webkist-chart'), [ { data: waterMedian, color: 'rgb(0,0,255)' },
+                                { data: airMedian, color: 'rgb(0,255,0)' } ], { yaxis: { max: 100, min: 50 }, xaxis: { tickFormatter: tickFmt, ticks: ticks } });
+
+                            $('#webkist-max-day.air .text').html((summary.air.max_day).toFixed(1));
+                            $('#webkist-max-day.water .text').html((summary.water.max_day).toFixed(1));
+
+                            $('#webkist-min-day.air .text').html((summary.air.min_day).toFixed(1));
+                            $('#webkist-min-day.water .text').html((summary.water.min_day).toFixed(1));
+
+                            $('#webkist-max-week.air .text').html((summary.air.max_week).toFixed(1));
+                            $('#webkist-max-week.water .text').html((summary.water.max_week).toFixed(1));
+
+                            $('#webkist-min-week.air .text').html((summary.air.min_week).toFixed(1));
+                            $('#webkist-min-week.water .text').html((summary.water.min_week).toFixed(1));
+
+                            $('#webkist-current-label').html(summary.current_time);
+                            $('#webkist-current.air .text').html((summary.air.current).toFixed(1));
+                            $('#webkist-current.water .text').html((summary.water.current).toFixed(1));
+                        });
+                    };
+                    update();
+                    $('#webkist-chart').click(function() { update(); });
+                 });
+        </script>
+    </head>
+    <body>
+        <div id="foo">
+            <h1>Duck, NC</h1>
+            <div class="full">
+                <div id="webkist-chart" style="width: 310px; height: 200px;">
+                    Loading...
+                </div>
+                <table id="summary" class="full">
+                    <tr>
+                         <th class="header" colspan="3">Observations</th>
+                    </tr>
+                    <tr>
+                        <th class="label"></th>
+                        <th class="air">Air</th>
+                        <th class="water">Water</th>
+                    </tr>
+                    <tr id="current">
+                        <th id="webkist-current-label" class="label">current</th>
+                        <td id="webkist-current" class="air"><span class="text"></span></td>
+                        <td id="webkist-current" class="water"><span class="text"></span></td>
+                    </tr>
+                    <tr>
+                        <th id="webkist-max-day-label" class="label">24hr max</th>
+                        <td id="webkist-max-day" class="air"><span class="text"></span></td>
+                        <td id="webkist-max-day" class="water"><span class="text"></span></td>
+                    </tr>
+                    <tr>
+                        <th id="webkist-min-day-label" class="label">24hr min</th>
+                        <td id="webkist-min-day" class="air"><span class="text"></span></td>
+                        <td id="webkist-min-day" class="water"><span class="text"></span></td>
+                    </tr>
+                    <tr>
+                        <th id="webkist-max-week-label" class="label">week max</th>
+                        <td id="webkist-max-week" class="air"><span class="text"></span></td>
+                        <td id="webkist-max-week" class="water"><span class="text"></span></td>
+                    </tr>
+                    <tr>
+                        <th id="webkist-min-week-label" class="label">week min</th>
+                        <td id="webkist-min-week" class="air"><span class="text"></span></td>
+                        <td id="webkist-min-week" class="water"><span class="text"></span></td>
+                    </tr>
+                </table>
+
+                <script type="text/javascript"><!--
+                    window.googleAfmcRequest = {
+                      client: 'ca-mb-pub-4150912532542394',
+                      ad_type: 'text_image',
+                      output: 'html',
+                      channel: '',
+                      format: '320x50_mb',
+                      oe: 'utf8',
+                      color_border: '336699',
+                      color_bg: 'FFFFFF',
+                      color_link: '0000FF',
+                      color_text: '000000',
+                      color_url: '008000',
+                    };
+                 //--></script>
+                 <script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_afmc_ads.js"></script>
+            </div>
+        </div>
+    </body>
+</html>
