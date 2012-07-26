@@ -2,13 +2,12 @@ $(document).ready(function() {
     var DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     var vpW = $(window).width();
     var vpH = $(window).height();
-    if(vpW > 1000) {
-        $("#webkist-chart").width(vpH / 2 * 1.5);
-        $("#webkist-chart").height(vpH / 2);
-    } else {
-        $("#webkist-chart").width(vpW - 10);
-        $("#webkist-chart").height(vpW * 0.66);
-    }
+    var chH = vpH - $("#webkist-table").height() - $("#header").height() - 50;
+
+    var chW = (vpW / chH > 2.0) ? chH * 2.0 - 20 : vpW - 20;
+
+    $("#webkist-chart").height(chH);
+    $("#webkist-chart").width(chW);
 
     if(window.location.hash.substr(0,1) == "#") $("#buoy").val(window.location.hash.substr(1));
 
@@ -30,8 +29,6 @@ $(document).ready(function() {
             // 2012 07 25 12 36  20 10.8 13.4    MM    MM    MM  MM     MM  26.2  25.2    MM   MM   MM    MM
             // 2012 07 25 12 30  20 10.8 12.9    MM    MM    MM  MM     MM  26.2  25.2    MM   MM   MM    MM
             var rows = data.split("\n").reverse();
-            var dPast = new Date((new Date).getTime() - 7 * 24 * 60 * 60 * 1000);
-            var today = (new Date).getDate();
 
             var maxDayAir = 0;
             var minDayAir;
@@ -44,14 +41,15 @@ $(document).ready(function() {
 
             var lastHour;
             var data = [];
-            var idx = 0;
             var waterData = [];
             var airData = [];
             var ticks = [];
-            var tickLabels = [];
             var currAir, currWater, currTime;
 
+            var dPast = new Date((new Date).getTime() - 7 * 24 * 60 * 60 * 1000);
+            var today = (new Date).getDate();
             var midnight = new Date(dPast.setHours(0));
+
             for(var i=0; i<8; i++) {
               ticks.push(midnight.getTime() + i * (24 * 60 * 60 * 1000));
             }
@@ -65,18 +63,9 @@ $(document).ready(function() {
 
               if(!lastHour) lastHour = DOW[d.getDay()] + " " + d.getHours();
 
-              var niceHour;
-              if(d.getHours() == 0) {
-                  niceHour = "midnight";
-              } else if(d.getHours() == 24) {
-                  niceHour = "noon";
-              } else if (d.getHours() <= 12) {
-                  niceHour = d.getHours() + "AM";
-              } else {
-                  niceHour = d.getHours() - 12 + "PM";
-              }
+              var niceTime = d.toLocaleTimeString().substr(0, 5) + (d.getHours() >= 12 ? " pm" : " am");
 
-              currTime = DOW[d.getDay()] + " " + niceHour;
+              currTime = DOW[d.getDay()] + " " + niceTime;
 
               if(cols[13] != "MM") {
                   ATMP = c_to_f(cols[13]);
