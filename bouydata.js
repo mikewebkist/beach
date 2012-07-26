@@ -10,6 +10,8 @@ $(document).ready(function() {
         $("#webkist-chart").height(vpW * 0.66);
     }
 
+    if(window.location.hash.substr(0,1) == "#") $("#bouy").val(window.location.hash.substr(1));
+
     var c_to_f = function(c) { return c * 1.8 + 32.0; };
     var median = function(a) {
       var t = 0;
@@ -145,5 +147,8 @@ $(document).ready(function() {
     };
     update();
     $('#webkist-chart').click(function() { update(); });
-    $('#bouy').change(function() { update(); });
+    $('#bouy').change(function() {
+            window.location.hash = "#" + $('#bouy').val();
+            update();
+        });
 });
