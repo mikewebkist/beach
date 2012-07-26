@@ -1,1 +1,1 @@
-Run parsenoaa.pl via cron every so often and redirect it's output to DUKN7.js in the same directory.
+hard-coded to the DUCK bouy, but easy enought to change.
