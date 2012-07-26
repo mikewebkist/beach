@@ -18,7 +18,8 @@ $(document).ready(function() {
     };
 
     var update = function() {
-        $.get('DUKN7.txt', function(data) {
+        var bouy = $("#bouy").val();
+        $.get(bouy + '.txt', function(data) {
             // alert('Load was performed.');
             // #YY  MM DD hh mm WDIR WSPD GST  WVHT   DPD   APD MWD   PRES  ATMP  WTMP  DEWP  VIS PTDY  TIDE
             // #yr  mo dy hr mn degT m/s  m/s     m   sec   sec degT   hPa  degC  degC  degC  nmi  hPa    ft
@@ -144,4 +145,5 @@ $(document).ready(function() {
     };
     update();
     $('#webkist-chart').click(function() { update(); });
+    $('#bouy').change(function() { update(); });
 });
