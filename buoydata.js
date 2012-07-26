@@ -2,7 +2,7 @@ $(document).ready(function() {
     var DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     var vpW = $(window).width();
     var vpH = $(window).height();
-    if(vpW > 800) {
+    if(vpW > 1000) {
         $("#webkist-chart").width(vpH / 2 * 1.5);
         $("#webkist-chart").height(vpH / 2);
     } else {
@@ -45,13 +45,16 @@ $(document).ready(function() {
             var lastHour;
             var data = [];
             var idx = 0;
-            var waterSamples = [];
-            var airSamples = [];
             var waterData = [];
             var airData = [];
             var ticks = [];
             var tickLabels = [];
             var currAir, currWater, currTime;
+
+            var midnight = new Date(dPast.setHours(0));
+            for(var i=0; i<8; i++) {
+              ticks.push(midnight.getTime() + i * (24 * 60 * 60 * 1000));
+            }
 
             for(var i=0; i<rows.length; i++) {
               if(rows[i].substr(0,1) == "#") continue;
@@ -61,19 +64,6 @@ $(document).ready(function() {
               var WTMP, ATMP;
 
               if(!lastHour) lastHour = DOW[d.getDay()] + " " + d.getHours();
-              var currHour = DOW[d.getDay()] + " " + d.getHours();
-              if(currHour != lastHour) {
-                  waterData.push([ idx, median(waterSamples) ]);
-                  waterSamples = [];
-                  airData.push([ idx, median(airSamples) ]);
-                  airSamples = [];
-                  lastHour = currHour;
-                  tickLabels.push(lastHour);
-                   if(lastHour.match(/ 0/)) {
-                       ticks.push(tickLabels.length - 1);
-                   }
-                   idx++;
-              }
 
               var niceHour;
               if(d.getHours() == 0) {
@@ -90,7 +80,7 @@ $(document).ready(function() {
 
               if(cols[13] != "MM") {
                   ATMP = c_to_f(cols[13]);
-                  airSamples.push(ATMP);
+                  airData.push([ d.getTime(), ATMP ]);
                   if(d.getDate() == today) {
                       if(ATMP > maxDayAir) maxDayAir = ATMP;
                       if(!minDayAir || ATMP < minDayAir) minDayAir = ATMP;
@@ -102,7 +92,7 @@ $(document).ready(function() {
 
               if(cols[14] != "MM") {
                   WTMP = c_to_f(cols[14]);
-                  waterSamples.push(WTMP);
+                  waterData.push([ d.getTime(), WTMP ]);
                   if(d.getDate() == today) {
                       if(WTMP > maxDayWater) maxDayWater = WTMP;
                       if(!minDayWater || WTMP < minDayWater) minDayWater = WTMP;
@@ -116,19 +106,17 @@ $(document).ready(function() {
             }
 
             var tickFmt = function(val, axis) {
-                if(tickLabels[val]) {
-                    return tickLabels[val].substring(0,3);
-                } else {
-                    return "";
-                }
+                return DOW[(new Date(val)).getDay()];
             };
+
             var chartMax = Math.ceil(maxWeekWater > maxWeekAir ? maxWeekWater : maxWeekAir);
             chartMax = chartMax - (chartMax % 5) + 5;
             var chartMin = Math.floor(minWeekAir < minWeekWater ? minWeekAir : minWeekWater);
             chartMin = chartMin - (chartMin % 5);
 
-            $.plot($('#webkist-chart'), [ { data: waterData, color: 'rgb(0,0,255)' },
-                    { data: airData, color: 'rgb(0,255,0)' } ], { yaxis: { max: chartMax, min: chartMin }, xaxis: { tickFormatter: tickFmt, ticks: ticks } });
+            $.plot($('#webkist-chart'), [ { data: airData, color: 'rgb(0,255,0)' }, { data: waterData, color: 'rgb(0,0,255)' } ],
+                    { yaxis: { max: chartMax, min: chartMin }, xaxis: { tickFormatter: tickFmt, ticks: ticks } });
+
             $('#webkist-chart').addClass("finished");
             $('#webkist-chart').removeClass("loading");
 
