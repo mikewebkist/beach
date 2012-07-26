@@ -10,7 +10,7 @@ $(document).ready(function() {
         $("#webkist-chart").height(vpW * 0.66);
     }
 
-    if(window.location.hash.substr(0,1) == "#") $("#bouy").val(window.location.hash.substr(1));
+    if(window.location.hash.substr(0,1) == "#") $("#buoy").val(window.location.hash.substr(1));
 
     var c_to_f = function(c) { return c * 1.8 + 32.0; };
     var median = function(a) {
@@ -22,8 +22,8 @@ $(document).ready(function() {
     var update = function() {
         $("#webkist-chart").addClass("loading");
         $("#webkist-chart").removeClass("finished");
-        var bouy = $("#bouy").val();
-        $.get(bouy + '.txt', function(data) {
+        var buoy = $("#buoy").val();
+        $.get(buoy + '.txt', function(data) {
             // alert('Load was performed.');
             // #YY  MM DD hh mm WDIR WSPD GST  WVHT   DPD   APD MWD   PRES  ATMP  WTMP  DEWP  VIS PTDY  TIDE
             // #yr  mo dy hr mn degT m/s  m/s     m   sec   sec degT   hPa  degC  degC  degC  nmi  hPa    ft
@@ -34,11 +34,11 @@ $(document).ready(function() {
             var today = (new Date).getDate();
 
             var maxDayAir = 0;
-            var minDayAir = 150;
+            var minDayAir;
             var maxWeekAir = 0;
             var minWeekAir = 150;
             var maxDayWater = 0;
-            var minDayWater = 150;
+            var minDayWater;
             var maxWeekWater = 0;
             var minWeekWater = 150;
 
@@ -93,10 +93,10 @@ $(document).ready(function() {
                   airSamples.push(ATMP);
                   if(d.getDate() == today) {
                       if(ATMP > maxDayAir) maxDayAir = ATMP;
-                      if(ATMP < minDayAir) minDayAir = ATMP;
+                      if(!minDayAir || ATMP < minDayAir) minDayAir = ATMP;
                   }
                   if(ATMP > maxWeekAir) maxWeekAir = ATMP;
-                  if(ATMP < minWeekAir) minWeekAir = ATMP;
+                  if(!minWeekAir || ATMP < minWeekAir) minWeekAir = ATMP;
                   currAir = ATMP;
               }
 
@@ -105,11 +105,11 @@ $(document).ready(function() {
                   waterSamples.push(WTMP);
                   if(d.getDate() == today) {
                       if(WTMP > maxDayWater) maxDayWater = WTMP;
-                      if(WTMP < minDayWater) minDayWater = WTMP;
+                      if(!minDayWater || WTMP < minDayWater) minDayWater = WTMP;
                   }
 
                   if(WTMP > maxWeekWater) maxWeekWater = WTMP;
-                  if(WTMP < minWeekWater) minWeekWater = WTMP;
+                  if(!minWeekWater || WTMP < minWeekWater) minWeekWater = WTMP;
                   currWater = WTMP;
               }
 
@@ -151,8 +151,8 @@ $(document).ready(function() {
     };
     update();
     $('#webkist-chart').click(function() { update(); });
-    $('#bouy').change(function() {
-            window.location.hash = "#" + $('#bouy').val();
+    $('#buoy').change(function() {
+            window.location.hash = "#" + $('#buoy').val();
             update();
         });
 });
