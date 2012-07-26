@@ -20,6 +20,17 @@
             div#webkist-chart {
                 margin-left: auto;
                 margin-right: auto;
+                text-align: center;
+            }
+
+            #webkist-chart.loading {
+                background-color: #fee;
+                border: 1px solid black;
+            }
+
+            #webkist-chart.finished {
+                background-color: #fff;
+                border: none;
             }
 
             div#foo {
@@ -68,7 +79,7 @@
     </head>
     <body>
         <div id="header"> <input id="bouy" type="text" name="bouy" value="DUKN7"> </div>
-        <div id="webkist-chart">
+        <div id="webkist-chart" class="loading">
             Loading...
         </div>
         <div id="webkist-table">

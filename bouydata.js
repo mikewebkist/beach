@@ -20,6 +20,8 @@ $(document).ready(function() {
     };
 
     var update = function() {
+        $("#webkist-chart").addClass("loading");
+        $("#webkist-chart").removeClass("finished");
         var bouy = $("#bouy").val();
         $.get(bouy + '.txt', function(data) {
             // alert('Load was performed.');
@@ -127,6 +129,8 @@ $(document).ready(function() {
 
             $.plot($('#webkist-chart'), [ { data: waterData, color: 'rgb(0,0,255)' },
                     { data: airData, color: 'rgb(0,255,0)' } ], { yaxis: { max: chartMax, min: chartMin }, xaxis: { tickFormatter: tickFmt, ticks: ticks } });
+            $('#webkist-chart').addClass("finished");
+            $('#webkist-chart').removeClass("loading");
 
             $('#webkist-max-day.air .text').html(maxDayAir.toFixed(1));
             $('#webkist-max-day.water .text').html(maxDayWater.toFixed(1));
