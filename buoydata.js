@@ -3,6 +3,7 @@ $(document).ready(function() {
     var vpW = $(window).width();
     var vpH = $(window).height();
     var chH = vpH - $("#webkist-table").height() - $("#header").height() - 50;
+    if(chH < 200) chH = 200;
 
     var chW = (vpW / chH > 2.0) ? chH * 2.0 - 20 : vpW - 20;
 
