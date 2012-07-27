@@ -24,7 +24,6 @@ $(document).ready(function() {
         $("#webkist-chart").removeClass("finished");
         var buoy = $("#buoy").val();
         $.get(buoy + '.txt', function(data) {
-            // alert('Load was performed.');
             // #YY  MM DD hh mm WDIR WSPD GST  WVHT   DPD   APD MWD   PRES  ATMP  WTMP  DEWP  VIS PTDY  TIDE
             // #yr  mo dy hr mn degT m/s  m/s     m   sec   sec degT   hPa  degC  degC  degC  nmi  hPa    ft
             // 2012 07 25 12 36  20 10.8 13.4    MM    MM    MM  MM     MM  26.2  25.2    MM   MM   MM    MM
@@ -64,9 +63,7 @@ $(document).ready(function() {
 
               if(!lastHour) lastHour = DOW[d.getDay()] + " " + d.getHours();
 
-              var niceTime = d.toLocaleTimeString().substr(0, 5) + (d.getHours() >= 12 ? " pm" : " am");
-
-              currTime = DOW[d.getDay()] + " " + niceTime;
+              currTime = DOW[d.getDay()] + d.strftime(" %H:%M %p");
 
               if(cols[13] != "MM") {
                   ATMP = c_to_f(cols[13]);
